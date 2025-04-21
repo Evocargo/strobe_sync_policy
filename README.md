@@ -16,37 +16,23 @@ This project provides a custom synchronization policy for ROS that takes into ac
 - Boost
 - C++17 compatible compiler
 
-### Building and Installing
+### Build
 
-1. Create a build directory and generate CMake instructions:
+CMake approach:
 ```bash
 mkdir build && cd build
-cmake ..
+cmake -DCMAKE_INSTALL_PREFIX=/opt/ros/<ROS-DISTRO> ..
+cmake --build . --target all
+sudo cmake --build . --target install
 ```
 
-2. Install the library:
+Catkin approach: add project to the workspace and run:
 ```bash
-sudo make install
+sudo su
+source /opt/ros/<ROS-DISTRO>/setup.sh
+catkin_make -DCMAKE_INSTALL_PREFIX=/opt/ros/<ROS-DISTRO> install
 ```
 
-## Dirrect copy
-Another option is to directly copy and use the strobe_sync_policy.hpp file in your project.
-```cpp
-#include "some/folder/strobe_sync_policy.hpp"
-```
-
-## Testing
-
-To build tests do a certain steps from the root folder:
-
-```bash
-mkdir build && cd build
-cmake .. -DBUILD_TESTS=ON
-sudo make install
-cmake --build .
-
-ctest --test-dir tests --verbose
-```
 
 ## Usage Example
 

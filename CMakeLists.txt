@@ -1,61 +1,47 @@
 cmake_minimum_required(VERSION 3.5)
+
 file(STRINGS VERSION CURRENT_VERSION)
 project(strobe_sync_policy VERSION ${CURRENT_VERSION})
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  message_filters
+)
 find_package(Boost REQUIRED)
 
-add_library(${PROJECT_NAME} INTERFACE)
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS roscpp message_filters
+  DEPENDS Boost
+)
 
-message(${Boost_INCLUDE_DIRS})
+add_library(${PROJECT_NAME} STATIC
+  src/strobe_sync_policy.cpp
+)
 
-target_include_directories(${PROJECT_NAME} INTERFACE
-    ${Boost_INCLUDE_DIRS}
+target_include_directories(${PROJECT_NAME}
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    ${catkin_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
 )
 
-install(
-    FILES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/strobe_sync_policy/strobe_sync_policy.hpp
-    DESTINATION include/${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
 )
 
-install(
-    TARGETS ${PROJECT_NAME}
-    EXPORT ${PROJECT_NAME}Targets
-    INCLUDES DESTINATION include
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.hpp"
 )
 
-include(CMakePackageConfigHelpers)
-configure_package_config_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-    INSTALL_DESTINATION lib/cmake/${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
-
-write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    VERSION ${CURRENT_VERSION}
-    COMPATIBILITY AnyNewerVersion
-)
-
-install(
-    FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    DESTINATION lib/cmake/${PROJECT_NAME}
-)
-
-install(
-    EXPORT ${PROJECT_NAME}Targets
-    FILE ${PROJECT_NAME}Targets.cmake
-    NAMESPACE ${PROJECT_NAME}::
-    DESTINATION lib/cmake/${PROJECT_NAME}
-)
-
-if(BUILD_TESTS)
-    add_subdirectory(tests)
-endif()
