@@ -3,6 +3,8 @@
 ## Overview
 This project provides a custom synchronization policy for ROS that takes into account the time shift between different topics. It's designed to help synchronize messages from multiple topics while considering potential delays or shifts in their timestamps.
 
+You can find catkin package suitable version in 'ros-package' project branch
+
 ## Features
 - Header-only library for easy integration
 - Compatible with ROS message filters
